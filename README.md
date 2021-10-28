@@ -1,4 +1,5 @@
-# Step-by-St3D Textured Sphere
+# Step-by-Step WebGPU Graphics Programming (35) 
+## Create a 3D Textured Sphere
 
 This is the source code for the 35th part of a series YouTube videos on step-by-step WebGPU graphics programming.
 
