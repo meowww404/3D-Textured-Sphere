@@ -3,15 +3,15 @@ import { CreateShapeWithTexture } from './texture';
 import { SphereData } from './vertex_data';
 import $ from 'jquery';
 
-const CreateShape = async (ul:number, vl:number, li:LightInputs = {}, textureFile:string, 
-    addressModeU:GPUAddressMode, addressModeV:GPUAddressMode, isAnimation = true) => {
+const CreateShape = async (ul:number, vl:number, li:LightInputs, textureFile:string, 
+    addressModeU:GPUAddressMode, addressModeV:GPUAddressMode, isAnimation:boolean) => {
     const data = SphereData(2, 50, 30, [0,0,0], ul, vl);
     await CreateShapeWithTexture(data?.vertexData!, data?.normalData!, data?.uvData!, textureFile, addressModeU, addressModeV, li, isAnimation);
 }
 
 let textureFile = 'earth.png';
-let addressModeU = 'repeat' as GPUAddressMode;
-let addressModeV = 'repeat' as GPUAddressMode;
+let addressModeU = 'clamp-to-edge' as GPUAddressMode;
+let addressModeV = 'clamp-to-edge' as GPUAddressMode;
 let li:LightInputs = {};
 let isAnimation = true;
 let ul = 1;
