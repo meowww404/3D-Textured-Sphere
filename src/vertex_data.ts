@@ -234,10 +234,10 @@ export const SphereData = (radius:number = 2, u:number = 20, v:number = 15, cent
             u1 = ul * (0.5+Math.atan2(p1[0]/radius,p1[2]/radius)/Math.PI/2);
             u2 = ul * (0.5+Math.atan2(p2[0]/radius,p2[2]/radius)/Math.PI/2);
             u3 = ul * (0.5+Math.atan2(p3[0]/radius,p3[2]/radius)/Math.PI/2);
-            v0 = vl * (0.5-Math.asin(p0[1]/radius)/Math.PI);
-            v1 = vl * (0.5-Math.asin(p1[1]/radius)/Math.PI);
-            v2 = vl * (0.5-Math.asin(p2[1]/radius)/Math.PI);
-            v3 = vl * (0.5-Math.asin(p3[1]/radius)/Math.PI);
+            v0 = vl * (0.5+Math.asin(p0[1]/radius)/Math.PI);
+            v1 = vl * (0.5+Math.asin(p1[1]/radius)/Math.PI);
+            v2 = vl * (0.5+Math.asin(p2[1]/radius)/Math.PI);
+            v3 = vl * (0.5+Math.asin(p3[1]/radius)/Math.PI);
 
             uv.push([
                 //first triangle
