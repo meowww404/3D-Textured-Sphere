@@ -3,7 +3,7 @@ export const GetTexture = async(device:GPUDevice, imageName:string,
 
     // get image file
     const img = document.createElement('img');
-    img.src = '../assets/' + imageName;
+    img.src = './assets/' + imageName;
     await img.decode();
     const imageBitmap = await createImageBitmap(img);
 
