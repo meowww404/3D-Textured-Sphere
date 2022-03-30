@@ -1,11 +1,19 @@
 import { InitGPU, CreateGPUBuffer, CreateTransforms, CreateViewProjection, CreateAnimation } from './helper';
-import { Shaders, LightInputs } from './shaders';
+import shader from './shader.wgsl';
 import { GetTexture } from './texture-data';
 import { vec3, mat4 } from 'gl-matrix';
 const createCamera = require('3d-view-controls');
 
+let ambientIntensity = 0.2;
+let diffuseIntensity = 0.8;
+let specularIntensity = 0.4;
+let shininess = 30;
+let specularColor = [1, 1, 1];
+let isPhong = 0;
+let isTwoSideLighting = 1;
+
 export const CreateShapeWithTexture = async (vertexData: Float32Array, normalData: Float32Array, uvData: Float32Array, 
-    textureFile = 'brick.png', addressModeU = 'repeat',addressModeV = 'repeat', lightInputs:LightInputs = {}, isAnimation = true) => {
+    textureFile = 'brick.png', addressModeU = 'repeat',addressModeV = 'repeat', isAnimation = true) => {
     const gpu = await InitGPU();
     const device = gpu.device;
 
@@ -15,13 +23,12 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
     const normalBuffer = CreateGPUBuffer(device, normalData);
     const uvBuffer = CreateGPUBuffer(device, uvData);
  
-    const shader = Shaders(lightInputs);
     const pipeline = device.createRenderPipeline({
         vertex: {
             module: device.createShaderModule({                    
-                code: shader.vertex
+                code: shader
             }),
-            entryPoint: "main",
+            entryPoint: "vs_main",
             buffers:[
                 {
                     arrayStride: 12,
@@ -51,9 +58,9 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
         },
         fragment: {
             module: device.createShaderModule({                    
-                code: shader.fragment
+                code: shader
             }),
-            entryPoint: "main",
+            entryPoint: "fs_main",
             targets: [
                 {
                     format: gpu.format as GPUTextureFormat
@@ -95,11 +102,27 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
     });
 
-    if(isAnimation){
+    const light_params = [
+        ambientIntensity,
+        diffuseIntensity,
+        specularIntensity,
+        shininess,
+        specularColor,
+        isPhong,
+        isTwoSideLighting,
+    ];
+
+    const lightUniformBuffer = device.createBuffer({
+        size: 36,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+    });
+
+    //if(isAnimation){
         device.queue.writeBuffer(vertexUniformBuffer, 0, vp.viewProjectionMatrix as ArrayBuffer);
         device.queue.writeBuffer(fragmentUniformBuffer, 0, lightPosition);
         device.queue.writeBuffer(fragmentUniformBuffer, 16, eyePosition);
-    }
+        device.queue.writeBuffer(lightUniformBuffer, 0, new Float32Array((light_params as any).flat()));
+    //}
 
     // get texture and sampler data
     const ts = await GetTexture(device, textureFile, addressModeU, addressModeV);
@@ -125,10 +148,18 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
             },
             {
                 binding: 2,
-                resource: ts.sampler
+                resource: {
+                    buffer: lightUniformBuffer,
+                    offset: 0,
+                    size: 36
+                }
             },
             {
                 binding: 3,
+                resource: ts.sampler
+            },
+            {
+                binding: 4,
                 resource: ts.texture.createView()
             }         
         ]
@@ -144,15 +175,17 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
     const renderPassDescription = {
         colorAttachments: [{
             view: textureView,
-            loadValue: { r: 0.2, g: 0.247, b: 0.314, a: 1.0 }, //background color
+            clearValue: { r: 0.2, g: 0.247, b: 0.314, a: 1.0 }, //background color
+            loadOp: 'clear',
             storeOp: 'store'
         }],
         depthStencilAttachment: {
             view: depthTexture.createView(),
-            depthLoadValue: 1.0,
+            depthClearValue: 1.0,
+            depthLoadOp: 'clear',
             depthStoreOp: "store",
-            stencilLoadValue: 0,
-            stencilStoreOp: "store"
+            //stencilLoadValue: 0,
+            //stencilStoreOp: "store"
         }
     };
     
@@ -188,7 +221,7 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
         renderPass.setVertexBuffer(2, uvBuffer);
         renderPass.setBindGroup(0, uniformBindGroup);       
         renderPass.draw(numberOfVertices);
-        renderPass.endPass();
+        renderPass.end();
 
         device.queue.submit([commandEncoder.finish()]);
     }

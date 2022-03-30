@@ -108,7 +108,8 @@ export const InitGPU = async () => {
     context.configure({
         device: device,
         format: format,
-        size: size
+        size: size,
+        compositingAlphaMode: 'premultiplied',
     });
     return{ device, canvas, format, context };
 };
