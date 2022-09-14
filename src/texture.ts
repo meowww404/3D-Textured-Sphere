@@ -24,6 +24,7 @@ export const CreateShapeWithTexture = async (vertexData: Float32Array, normalDat
     const uvBuffer = CreateGPUBuffer(device, uvData);
  
     const pipeline = device.createRenderPipeline({
+        layout:'auto',
         vertex: {
             module: device.createShaderModule({                    
                 code: shader
