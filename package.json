@@ -9,7 +9,8 @@
     "dev": "webpack --mode development",
     "prod": "webpack --mode production",
     "watch": "webpack --watch --mode production",
-    "deploy": "push-dir --dir=dist --branch=gh-pages --allow-unclean"
+    "deploy": "push-dir --dir=dist --branch=gh-pages --allow-unclean",
+    "start": "http-server"
   },
   "keywords": [],
   "author": "",

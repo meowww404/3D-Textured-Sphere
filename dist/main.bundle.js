@@ -22951,7 +22951,7 @@ let shininess = 30;
 let specularColor = [1, 1, 1];
 let isPhong = 0;
 let isTwoSideLighting = 1;
-const CreateShapeWithTexture = (vertexData, normalData, uvData, textureFile = 'vapordark.png', addressModeU = 'repeat', addressModeV = 'repeat', isAnimation = true) => __awaiter(void 0, void 0, void 0, function* () {
+const CreateShapeWithTexture = (vertexData, normalData, uvData, textureFile = 'brick.png', addressModeU = 'repeat', addressModeV = 'repeat', isAnimation = true) => __awaiter(void 0, void 0, void 0, function* () {
     const gpu = yield helper_1.InitGPU();
     const device = gpu.device;
     // create vertex buffers
